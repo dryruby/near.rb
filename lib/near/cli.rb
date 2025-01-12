@@ -4,6 +4,8 @@ require 'json'
 require 'open3'
 
 class NEAR::CLI
+  NEAR_ENV = ENV['NEAR_ENV'] || 'testnet'
+
   class Error < StandardError; end
   class ProgramNotFoundError < Error; end
   class ExecutionError < Error; end
@@ -22,27 +24,61 @@ class NEAR::CLI
     raise ProgramNotFoundError
   end
 
-  def initialize(path = self.class.find_program)
-    @path = path
+  ##
+  # @param [String, #to_s] path
+  # @param [String, #to_s] network
+  def initialize(path: self.class.find_program, network: NEAR_ENV)
+    @path = path.to_s
+    @network = network.to_s
   end
 
+  ##
+  # @return [String]
   def version
     self.execute(self.build_command('--version'))
   end
 
-  private
-
-  def build_command(*args)
-    [@path, *args.map(&:to_s)]
+  ##
+  # @param [String] account_id
+  # @param [String] block
+  # @return [String]
+  def view_near_balance(account_id, block: 'now')
+    _, output = execute(
+      'tokens',
+      account_id,
+      'view-near-balance',
+      'network-config', @network,
+      block
+    )
+    /^#{account_id} account has (\d+.\d+) NEAR available for transfer/ === output
+    $1
   end
 
-  def execute(cmd)
-    stdout, stderr, status = Open3.capture3(*cmd)
+  ##
+  # @param [String] account_id
+  # @param [String] block
+  # @return [String]
+  def view_account_summary(account_id, block: 'now')
+    _, output = execute(
+      'account',
+      'view-account-summary', account_id,
+      'network-config', @network,
+      block
+    )
+    output # TODO
+  end
+
+  private
+
+  def execute(*args)
+    command = [@path, *args.map(&:to_s)]
+    #puts command.join(' ')
+    stdout, stderr, status = Open3.capture3(*command)
 
     if status.success?
-      stdout.strip
+      [stdout.strip, stderr.strip]
     else
-      raise ExecutionError, "Command failed: #{stderr}"
+      raise ExecutionError, "Command `#{command.join(' ')}` failed with exit code #{status.exitstatus}: #{stderr}"
     end
   end
 end # NEAR::CLI
