@@ -44,7 +44,7 @@ class NEAR::Block
   attr_reader :hash
 
   ##
-  # @return [Array(String)]
+  # @return [Array<String>]
   def to_args
     return ['at-block-height', @height] if @height
     return ['at-block-hash', @hash] if @hash

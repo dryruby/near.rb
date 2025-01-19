@@ -3,6 +3,17 @@
 require 'json'
 require 'open3'
 
+require_relative 'block'
+
+class NEAR::CLI; end
+
+require_relative 'cli/account'
+require_relative 'cli/config'
+require_relative 'cli/contract'
+require_relative 'cli/staking'
+require_relative 'cli/tokens'
+require_relative 'cli/transaction'
+
 class NEAR::CLI
   NEAR_ENV = ENV['NEAR_ENV'] || 'testnet'
 
@@ -28,57 +39,49 @@ class NEAR::CLI
   # @param [String, #to_s] path
   # @param [String, #to_s] network
   def initialize(path: self.class.find_program, network: NEAR_ENV)
-    @path = path.to_s
-    @network = network.to_s
+    @path, @network = path.to_s, network.to_s
   end
 
   ##
   # @return [String]
   def version
-    self.execute(self.build_command('--version'))
+    self.execute('--version').first.strip
   end
 
-  ##
-  # @param [String] account_id
-  # @param [String] block
-  # @return [String]
-  def view_near_balance(account_id, block: 'now')
-    _, output = execute(
-      'tokens',
-      account_id,
-      'view-near-balance',
-      'network-config', @network,
-      block
-    )
-    /^#{account_id} account has (\d+.\d+) NEAR available for transfer/ === output
-    $1
-  end
-
-  ##
-  # @param [String] account_id
-  # @param [String] block
-  # @return [String]
-  def view_account_summary(account_id, block: 'now')
-    _, output = execute(
-      'account',
-      'view-account-summary', account_id,
-      'network-config', @network,
-      block
-    )
-    output # TODO
-  end
+  include NEAR::CLI::Account
+  include NEAR::CLI::Tokens
+  include NEAR::CLI::Staking
+  include NEAR::CLI::Contract
+  include NEAR::CLI::Transaction
+  include NEAR::CLI::Config
 
   private
 
+  ##
+  # @param [Array<String>] args
+  # @return [Array<String>]
   def execute(*args)
     command = [@path, *args.map(&:to_s)]
-    #puts command.join(' ')
+    puts command.join(' ') if false
     stdout, stderr, status = Open3.capture3(*command)
 
     if status.success?
       [stdout.strip, stderr.strip]
     else
-      raise ExecutionError, "Command `#{command.join(' ')}` failed with exit code #{status.exitstatus}: #{stderr}"
+      raise ExecutionError, "Command `#{command.join(' ')}` failed with exit code #{status.exitstatus}: #{stderr.strip}"
     end
+  end
+
+  ##
+  # @param [Block, Integer, String, Symbol] block
+  def block_args(block)
+    block = case block
+      when :now then return ['now']
+      when NEAR::Block then block
+      when Integer then NEAR::Block.at_height(block)
+      when String then NEAR::Block.at_hash(block)
+      else raise "invalid block specifier: #{block.inspect}"
+    end
+    block.to_args
   end
 end # NEAR::CLI
