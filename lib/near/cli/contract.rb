@@ -94,18 +94,18 @@ module NEAR::CLI::Contract
   # Downloads a contract's WASM code.
   #
   # @param [String] contract_id
-  # @param [String] output_dir Directory to save the .wasm file
+  # @param [String] output_path Path to write the .wasm file to
   # @param [Block, Integer, String, Symbol] block
   # @return [String] Path to downloaded file
-  def download_wasm(contract_id, output_dir, block: :now)
-    stdout, stderr = execute(
+  def download_wasm(contract_id, output_path, block: :now)
+    _, _ = execute(
       'contract',
       'download-wasm', contract_id,
-      'to-folder', output_dir,
+      'save-to-file', output_path,
       'network-config', @network,
       *block_args(block)
     )
-    stderr
+    output_path
   end
 
   ##
