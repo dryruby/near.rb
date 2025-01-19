@@ -45,7 +45,7 @@ class NEAR::Block
 
   ##
   # @return [Array<String>]
-  def to_args
+  def to_cli_args
     return ['at-block-height', @height] if @height
     return ['at-block-hash', @hash] if @hash
     ['now']

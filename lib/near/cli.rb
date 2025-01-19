@@ -82,6 +82,6 @@ class NEAR::CLI
       when String then NEAR::Block.at_hash(block)
       else raise "invalid block specifier: #{block.inspect}"
     end
-    block.to_args
+    block.to_cli_args
   end
 end # NEAR::CLI

@@ -11,6 +11,7 @@ class NEAR::Balance
 
   ##
   # @param [Numeric] quantity
+  # @raise [ArgumentError] if quantity is not a valid number
   def initialize(quantity)
     @quantity = case quantity
       when BigDecimal then quantity

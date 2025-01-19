@@ -18,6 +18,14 @@ class NEAR::Account
   attr_reader :id
 
   ##
+  # The balance as a Ⓝ-prefixed string.
+  #
+  # @return [String]
+  def inspect
+    "Ⓝ#{@id}"
+  end
+
+  ##
   # @return [String]
   def to_s; @id; end
 end # NEAR::Block
