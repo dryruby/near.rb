@@ -1,17 +1,33 @@
 # This is free and unencumbered software released into the public domain.
 
+require 'bigdecimal'
+
 ##
 # Represents a NEAR balance.
 class NEAR::Balance
+  def self.from_near(s)
+    self.new(s)
+  end
+
   ##
   # @param [Numeric] quantity
   def initialize(quantity)
     @quantity = case quantity
+      when BigDecimal then quantity
       when Rational then quantity
       when Integer then quantity
       when Float then quantity
+      when String then BigDecimal(quantity)
       else raise ArgumentError, "invalid quantity: #{quantity.inspect}"
     end
+  end
+
+  ##
+  # The balance as a Ⓝ-prefixed string.
+  #
+  # @return [String]
+  def inspect
+    "Ⓝ#{@quantity.to_f}"
   end
 
   ##
