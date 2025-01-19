@@ -4,26 +4,44 @@
 # Represents a NEAR block.
 class NEAR::Block
   ##
-  # @param [Integer] height
+  # @return [NEAR::Block]
+  def self.now
+    self.new
+  end
+
+  ##
+  # @param [Integer, #to_i] height
   # @return [NEAR::Block]
   def self.at_height(height)
     self.new(height: height)
   end
 
   ##
-  # @param [String] hash
+  # @param [String, #to_s] hash
   # @return [NEAR::Block]
   def self.at_hash(hash)
     self.new(hash: hash)
   end
 
   ##
-  # @param [Integer, nil] height
-  # @param [String, nil] hash
+  # @param [Integer, #to_i] height
+  # @param [String, #to_s] hash
   def initialize(height: nil, hash: nil)
-    @height = height if height
-    @hash = hash if hash
+    @height = height.to_i if height
+    @hash = hash.to_s if hash
   end
+
+  ##
+  # The height of the block.
+  #
+  # @return [Integer]
+  attr_reader :height
+
+  ##
+  # The hash of the block.
+  #
+  # @return [String]
+  attr_reader :hash
 
   ##
   # @return [Array(String)]
@@ -36,6 +54,6 @@ class NEAR::Block
   ##
   # @return [String]
   def to_s
-    (@height || @hash || 'now').to_s
+    (@height || @hash || :now).to_s
   end
 end # NEAR::Block
