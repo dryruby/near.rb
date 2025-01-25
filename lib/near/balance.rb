@@ -24,6 +24,10 @@ class NEAR::Balance
   end
 
   ##
+  # The canonical zero balance.
+  ZERO = self.new(0).freeze
+
+  ##
   # The balance as a Ⓝ-prefixed string.
   #
   # @return [String]

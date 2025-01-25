@@ -1,5 +1,7 @@
 # This is free and unencumbered software released into the public domain.
 
+require "base64"
+
 ##
 # @see https://github.com/near/near-cli-rs/blob/main/docs/GUIDE.en.md#contract---Manage-smart-contracts-deploy-code-call-functions
 module NEAR::CLI::Contract
@@ -28,20 +30,28 @@ module NEAR::CLI::Contract
   #
   # @param [String] contract_id
   # @param [String] method_name
-  # @param [Hash] args JSON arguments for the method
-  # @param [String] signer_id Account that signs the transaction
-  # @param [String] deposit Amount of NEAR to attach
-  # @param [String] gas Amount of gas to attach
+  # @param [Hash, Array, String] args Arguments for the method
+  # @param [NEAR::Account] signer Account that signs the transaction
+  # @param [NEAR::Balance] deposit Amount of NEAR to attach
+  # @param [NEAR::Gas, #to_s] gas Amount of gas to attach
   # @return [String] Transaction result
-  def call_function(contract_id, method_name, args = {}, signer_id:, deposit: '0 NEAR', gas: '30 TGas')
+  def call_function(contract_id, method_name, args = {}, signer:, deposit: nil, gas: '100.0 Tgas')
+    args = case args
+      when Hash, Array then ['json-args', args.to_json]
+      when String then case
+        when args.ascii_only? then ['text-args', args]
+        else ['base64-args', Base64.encode64(args)]
+      end
+      else raise ArgumentError, "Invalid argument type: #{args.inspect}"
+    end
     stdout, stderr = execute(
       'contract',
       'call-function',
-      'as-transaction', contract_id, method_name,
-      'json-args', args.to_json,
-      'prepaid-gas', gas,
-      'attached-deposit', deposit,
-      'sign-as', signer_id,
+      'as-transaction', contract_id.to_s, method_name.to_s,
+      *args,
+      'prepaid-gas', gas.to_s,
+      'attached-deposit', (deposit ? deposit.to_s : '0') + ' NEAR',
+      'sign-as', signer.to_s,
       'network-config', @network,
       'sign-with-keychain',
       'send'
