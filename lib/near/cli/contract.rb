@@ -1,6 +1,7 @@
 # This is free and unencumbered software released into the public domain.
 
 require "base64"
+require "pathname"
 
 ##
 # @see https://github.com/near/near-cli-rs/blob/main/docs/GUIDE.en.md#contract---Manage-smart-contracts-deploy-code-call-functions
@@ -28,26 +29,27 @@ module NEAR::CLI::Contract
   ##
   # Calls a state-changing method on a contract.
   #
-  # @param [String] contract_id
+  # @param [NEAR::Account] contract
   # @param [String] method_name
-  # @param [Hash, Array, String] args Arguments for the method
+  # @param [Hash, Array, String, Pathname] args Arguments for the method
   # @param [NEAR::Account] signer Account that signs the transaction
   # @param [NEAR::Balance] deposit Amount of NEAR to attach
   # @param [NEAR::Gas, #to_s] gas Amount of gas to attach
   # @return [String] Transaction result
-  def call_function(contract_id, method_name, args = {}, signer:, deposit: nil, gas: '100.0 Tgas')
+  def call_function(contract, method_name, args = {}, signer:, deposit: nil, gas: '100.0 Tgas')
     args = case args
       when Hash, Array then ['json-args', args.to_json]
       when String then case
         when args.ascii_only? then ['text-args', args]
-        else ['base64-args', Base64.encode64(args)]
+        else ['base64-args', Base64.strict_encode64(args)]
       end
+      when Pathname then ['file-args', args.to_s]
       else raise ArgumentError, "Invalid argument type: #{args.inspect}"
     end
     stdout, stderr = execute(
       'contract',
       'call-function',
-      'as-transaction', contract_id.to_s, method_name.to_s,
+      'as-transaction', contract.to_s, method_name.to_s,
       *args,
       'prepaid-gas', gas.to_s,
       'attached-deposit', (deposit ? deposit.to_s : '0') + ' NEAR',
