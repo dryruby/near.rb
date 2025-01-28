@@ -88,18 +88,17 @@ module NEAR::CLI::Account
   ##
   # Creates a new account funded by another account.
   #
-  # @param [String] new_account_id
-  # @param [String] funding_account_id
-  # @param [String] public_key
-  # @param [String] deposit
+  # @param [NEAR::Account] new_account
+  # @param [NEAR::Account] signer Account that signs & funds the transaction
+  # @param [NEAR::Balance] deposit Amount of NEAR to attach
   # @return [String]
-  def create_account_with_funding(new_account_id, funding_account_id, public_key, deposit)
+  def create_account_with_funding(new_account, signer:, deposit: nil)
     stdout, stderr = execute(
       'account',
       'create-account',
-      'fund-myself', new_account_id, deposit,
-      'use-manually-provided-public-key', public_key,
-      'sign-as', funding_account_id,
+      'fund-myself', new_account.to_s, (deposit ? deposit.to_s : '0') + ' NEAR',
+      'autogenerate-new-keypair', 'save-to-keychain',
+      'sign-as', signer.to_s,
       'network-config', @network,
       'sign-with-keychain',
       'send'

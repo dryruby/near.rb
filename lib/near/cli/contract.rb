@@ -9,16 +9,16 @@ module NEAR::CLI::Contract
   ##
   # Calls a view method on a contract (read-only).
   #
-  # @param [String] contract_id
+  # @param [NEAR::Account] contract
   # @param [String] method_name
   # @param [Hash] args JSON arguments for the method
   # @param [Block, Integer, String, Symbol] block
   # @return [String] The method call result
-  def view_call(contract_id, method_name, args = {}, block: :now)
+  def view_call(contract, method_name, args = {}, block: :now)
     stdout, _ = execute(
       'contract',
       'call-function',
-      'as-read-only', contract_id, method_name,
+      'as-read-only', contract.to_s, method_name,
       'json-args', args.to_json,
       'network-config', @network,
       *block_args(block)
