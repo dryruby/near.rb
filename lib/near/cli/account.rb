@@ -125,14 +125,15 @@ module NEAR::CLI::Account
   ##
   # Deletes an account and transfers remaining balance to beneficiary.
   #
-  # @param [String] account_id
-  # @param [String] beneficiary_id
+  # @param [NEAR::Account] account
+  # @param [NEAR::Account] beneficiary
   # @return [String]
-  def delete_account(account_id, beneficiary_id)
+  def delete_account(account, beneficiary: nil)
+    account = NEAR::Account.parse(account)
     stdout, stderr = execute(
       'account',
-      'delete-account', account_id,
-      'beneficiary', beneficiary_id,
+      'delete-account', account.to_s,
+      'beneficiary', (beneficiary || account.parent).to_s,
       'network-config', @network,
       'sign-with-keychain',
       'send'
