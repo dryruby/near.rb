@@ -61,7 +61,7 @@ class NEAR::CLI
   # @param [Array<String>] args
   # @return [Array<String>]
   def execute(*args)
-    command = [@path, *args.map(&:to_s)]
+    command = [@path, '--quiet', *args.map(&:to_s)]
     puts command.join(' ') if false
     stdout, stderr, status = Open3.capture3(*command)
 

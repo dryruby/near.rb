@@ -23,7 +23,7 @@ It wraps the [NEAR command-line interface] (CLI) into a Ruby interface.
 
 ## 🛠️ Prerequisites
 
-- [NEAR CLI] 0.17+
+- [NEAR CLI] 0.19+
 - [Ruby] 3.0+
 
 ## ⬇️ Installation
