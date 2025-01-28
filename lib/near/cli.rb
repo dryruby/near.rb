@@ -22,6 +22,8 @@ class NEAR::CLI
   class ExecutionError < Error; end
 
   def self.find_program
+    return ENV['NEAR_CLI'] if ENV['NEAR_CLI']
+
     # First, check `$HOME/.cargo/bin/near`:
     path = File.expand_path('~/.cargo/bin/near')
     return path if File.executable?(path)
