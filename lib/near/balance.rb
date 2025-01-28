@@ -39,7 +39,12 @@ class NEAR::Balance
   # The balance as a string.
   #
   # @return [String]
-  def to_s; @quantity.to_s; end
+  def to_s
+    case @quantity
+      when BigDecimal then @quantity.to_s('F')
+      else @quantity.to_s
+    end
+  end
 
   ##
   # The balance as a rational number.
