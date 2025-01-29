@@ -46,7 +46,7 @@ require 'near'
 ### Fetching block information
 
 Block data is fetched from the high-performance [neardata.xyz] API
-that caches blocks using Cloudflare's network that has more than 330
+that caches blocks using Cloudflare's network with more than 330
 global edge locations:
 
 ```ruby
