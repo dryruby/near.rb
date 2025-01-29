@@ -39,7 +39,7 @@ class NEAR::CLI
 
   ##
   # @param [String, #to_s] path
-  # @param [String, #to_s] network
+  # @param [Network, #to_s] network
   def initialize(path: self.class.find_program, network: NEAR_ENV)
     @path, @network = path.to_s, network.to_s
   end

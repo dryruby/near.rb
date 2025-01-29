@@ -17,6 +17,7 @@ It wraps the [NEAR command-line interface] (CLI) into a Ruby interface.
 - Handles transaction construction, signing, and monitoring.
 - Integrates with hardware wallets and secure key storage.
 - Implements type-safe balance operations and input validation.
+- Fetches block data from the [neardata.xyz] API.
 - Supports both the [mainnet] and [testnet] environments.
 - Offers cross-platform support with zero library dependencies.
 - 100% free and unencumbered public domain software.
@@ -40,12 +41,26 @@ gem install near
 
 ```ruby
 require 'near'
+```
 
+### Fetching block information
+
+Block data is fetched from the high-performance [neardata.xyz] API
+that caches blocks using Cloudflare's network that has more than 330
+global edge locations:
+
+```ruby
+block = NEAR.testnet.fetch(186_132_854)
+```
+
+### Instantiating the CLI wrapper
+
+```ruby
 # Use the NEAR testnet (the default):
-testnet = NEAR::CLI.new(network: 'testnet')
+testnet = NEAR::CLI.new(network: NEAR.testnet)
 
 # Use the NEAR mainnet (to test in prod):
-# mainnet = NEAR::CLI.new(network: 'mainnet')
+# mainnet = NEAR::CLI.new(network: NEAR.mainnet)
 ```
 
 ### Viewing account details
@@ -230,3 +245,4 @@ git clone https://github.com/dryruby/near.rb.git
 [Ruby]: https://ruby-lang.org
 [mainnet]: https://docs.near.org/concepts/basics/networks#mainnet
 [testnet]: https://docs.near.org/concepts/basics/networks#testnet
+[neardata.xyz]: https://neardata.xyz
