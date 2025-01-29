@@ -52,6 +52,12 @@ class NEAR::Block
   end
 
   ##
+  # @return [Integer]
+  def to_i
+    @height
+  end
+
+  ##
   # @return [String]
   def to_s
     (@height || @hash || :now).to_s
