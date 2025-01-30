@@ -4,6 +4,8 @@ require 'faraday'
 require 'faraday/follow_redirects'
 require 'faraday/retry'
 
+require_relative 'error'
+
 ##
 # Represents a NEAR Protocol network.
 #
@@ -30,12 +32,12 @@ class NEAR::Network
   # Fetches the block at the given height.
   #
   # The block data is fetched from the neardata.xyz API.
-  # If the block does not exist, `nil` is returned.
   #
   # @param [NEAR::Block, #to_i] block
   # @return [NEAR::Block]
+  # @raise [NEAR::Error::InvalidBlock] if the block does not exist
   def fetch(block)
-    self.fetch_neardata_block("/v0/block/#{block.to_i}")
+    self.fetch_neardata_block(block.to_i)
   end
 
   ##
@@ -46,16 +48,32 @@ class NEAR::Network
   #
   # @return [NEAR::Block]
   def fetch_latest
-    self.fetch_neardata_block("/v0/last_block/final")
+    self.fetch_neardata_block(:final)
   end
 
   protected
 
   ##
+  # @param [Integer, Symbol] block_id
   # @return [NEAR::Block]
-  def fetch_neardata_block(path)
-    block_data = self.fetch_neardata_url(path)
-    return nil unless block_data
+  def fetch_neardata_block(block_id)
+    request_path = case block_id
+      when Integer then "/v0/block/#{block_id}"
+      when Symbol then "/v0/last_block/#{block_id}"
+      else raise ArgumentError
+    end
+
+    begin
+      block_data = self.fetch_neardata_url(request_path)
+    rescue Faraday::ResourceNotFound => error
+      case error.response[:body]['type']
+        when "BLOCK_DOES_NOT_EXIST", "BLOCK_HEIGHT_TOO_LOW", "BLOCK_HEIGHT_TOO_HIGH"
+          raise NEAR::Error::InvalidBlock, block_id
+        else raise error
+      end
+    end
+
+    return nil if block_data.nil? || block_data == 'null'
     block_header = block_data['block']['header']
     block_height = block_header['height'].to_i
     block_hash = block_header['hash'].to_s
@@ -66,8 +84,6 @@ class NEAR::Network
   # @return [Object]
   def fetch_neardata_url(path)
     self.http_client.get("#{neardata_url}#{path}").body
-  rescue Faraday::ResourceNotFound
-    nil
   end
 
   ##
