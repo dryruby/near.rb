@@ -2,6 +2,7 @@
 
 require 'faraday'
 require 'faraday/follow_redirects'
+require 'faraday/retry'
 
 ##
 # Represents a NEAR Protocol network.
@@ -53,19 +54,19 @@ class NEAR::Network
   ##
   # @return [Object]
   def fetch_neardata(path)
-    response = self.http_client.get("#{neardata_url}#{path}")
-    case response.status
-      when 200 then JSON.parse(response.body)
-      when 404 then nil
-      else raise response.to_s
-    end
+    self.http_client.get("#{neardata_url}#{path}").body
+  rescue Faraday::ResourceNotFound
+    nil
   end
 
   ##
   # @return [Faraday::Connection]
   def http_client
     Faraday.new do |faraday|
+      faraday.request :retry
+      faraday.response :raise_error
       faraday.response :follow_redirects
+      faraday.response :json
     end
   end
 end # NEAR::Testnet

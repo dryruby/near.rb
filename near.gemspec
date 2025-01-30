@@ -26,6 +26,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 3.0'
   gem.add_runtime_dependency 'faraday', '>= 2.12'
   gem.add_runtime_dependency 'faraday-follow_redirects', '>= 0.3'
+  gem.add_runtime_dependency 'faraday-retry', '>= 2.0'
   gem.add_development_dependency 'rspec', '~> 3.12'
   gem.add_development_dependency 'yard' , '~> 0.9'
 end
