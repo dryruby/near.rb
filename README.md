@@ -6,10 +6,12 @@
 [![Documentation](https://img.shields.io/badge/rubydoc-latest-blue)](https://rubydoc.info/gems/near)
 
 **NEAR.rb** is a [Ruby] client library for the [NEAR Protocol].
-It wraps the [NEAR command-line interface] (CLI) into a Ruby interface.
+It provides a [neardata.xyz] API client as well as wraps the
+[NEAR command-line interface] (CLI) in a usable Ruby interface.
 
 ## ✨ Features
 
+- Fetches block data from the [neardata.xyz] API.
 - Wraps the complete CLI features in an idiomatic Ruby interface.
 - Provides comprehensive account management operations.
 - Supports token operations for NEAR and other assets.
@@ -17,7 +19,6 @@ It wraps the [NEAR command-line interface] (CLI) into a Ruby interface.
 - Handles transaction construction, signing, and monitoring.
 - Integrates with hardware wallets and secure key storage.
 - Implements type-safe balance operations and input validation.
-- Fetches block data from the [neardata.xyz] API.
 - Supports both the [mainnet] and [testnet] environments.
 - Offers cross-platform support with zero library dependencies.
 - 100% free and unencumbered public domain software.
@@ -51,6 +52,20 @@ global edge locations:
 
 ```ruby
 block = NEAR.testnet.fetch(186_132_854)
+```
+
+### Tracking block production
+
+Thanks to the built-in [neardata.xyz] API client, it is trivial to
+track the current tip of the chain in a robust and efficient manner:
+
+```ruby
+block_height = NEAR.testnet.fetch_latest.height
+(block_height..).each do |block_height|
+  block = NEAR.testnet.fetch(block_height)
+
+  puts [block.height, block.hash].join("\t")
+end
 ```
 
 ### Instantiating the CLI wrapper
