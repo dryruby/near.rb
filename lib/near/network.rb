@@ -33,9 +33,9 @@ class NEAR::Network
   # If the block does not exist, `nil` is returned.
   #
   # @param [NEAR::Block, #to_i] block
-  # @return [Object]
+  # @return [NEAR::Block]
   def fetch(block)
-    self.fetch_neardata("/v0/block/#{block.to_i}")
+    self.fetch_neardata_block("/v0/block/#{block.to_i}")
   end
 
   ##
@@ -44,16 +44,27 @@ class NEAR::Network
   # The block data is fetched from the neardata.xyz API.
   # The block is guaranteed to exist.
   #
-  # @return [Object]
+  # @return [NEAR::Block]
   def fetch_latest
-    self.fetch_neardata("/v0/last_block/final")
+    self.fetch_neardata_block("/v0/last_block/final")
   end
 
   protected
 
   ##
+  # @return [NEAR::Block]
+  def fetch_neardata_block(path)
+    block_data = self.fetch_neardata_url(path)
+    return nil unless block_data
+    block_header = block_data['block']['header']
+    block_height = block_header['height'].to_i
+    block_hash = block_header['hash'].to_s
+    NEAR::Block.new(height: block_height, hash: block_hash, data: block_data)
+  end
+
+  ##
   # @return [Object]
-  def fetch_neardata(path)
+  def fetch_neardata_url(path)
     self.http_client.get("#{neardata_url}#{path}").body
   rescue Faraday::ResourceNotFound
     nil

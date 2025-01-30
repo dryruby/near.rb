@@ -26,9 +26,11 @@ class NEAR::Block
   ##
   # @param [Integer, #to_i] height
   # @param [String, #to_s] hash
-  def initialize(height: nil, hash: nil)
+  # @param [Hash, #to_h] data
+  def initialize(height: nil, hash: nil, data: nil)
     @height = height.to_i if height
     @hash = hash.to_s if hash
+    @data = data.to_h if data
   end
 
   ##
@@ -44,6 +46,36 @@ class NEAR::Block
   attr_reader :hash
 
   ##
+  # The block data, if fetched.
+  #
+  # @return [Hash]
+  attr_reader :data
+
+  ##
+  # @return [String]
+  def author
+    self.data['block']['author']
+  end
+
+  ##
+  # @return [Hash]
+  def header
+    self.data['block']['header']
+  end
+
+  ##
+  # @return [Array<Hash>]
+  def chunks
+    self.data['block']['chunks']
+  end
+
+  ##
+  # @return [Array<Hash>]
+  def shards
+    self.data['shards']
+  end
+
+  ##
   # @return [Array<String>]
   def to_cli_args
     return ['at-block-height', @height] if @height
@@ -53,13 +85,15 @@ class NEAR::Block
 
   ##
   # @return [Integer]
-  def to_i
-    @height
-  end
+  def to_i; @height; end
 
   ##
   # @return [String]
   def to_s
     (@height || @hash || :now).to_s
   end
+
+  ##
+  # @return [Hash]
+  def to_h; @data; end
 end # NEAR::Block
