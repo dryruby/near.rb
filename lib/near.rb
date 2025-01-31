@@ -3,6 +3,7 @@
 module NEAR; end
 
 require_relative 'near/account'
+require_relative 'near/action'
 require_relative 'near/balance'
 require_relative 'near/block'
 require_relative 'near/cli'

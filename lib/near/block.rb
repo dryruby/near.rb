@@ -53,26 +53,66 @@ class NEAR::Block
 
   ##
   # @return [String]
+  attr_reader :author
   def author
     self.data['block']['author']
   end
 
   ##
+  # The block header.
+  #
   # @return [Hash]
+  attr_reader :header
   def header
     self.data['block']['header']
   end
 
   ##
   # @return [Array<Hash>]
+  attr_reader :chunks
   def chunks
     self.data['block']['chunks']
   end
 
   ##
   # @return [Array<Hash>]
+  attr_reader :shards
   def shards
     self.data['shards']
+  end
+
+  ##
+  # The set of signers in the transactions in this block.
+  #
+  # @return [Array<NEAR::Account>]
+  def signers
+    self.collect_transaction_field('signer_id')
+      .map { |id| NEAR::Account.new(id) }
+  end
+
+  ##
+  # The set of receivers in the transactions in this block.
+  #
+  # @return [Array<NEAR::Account>]
+  def receivers
+    self.collect_transaction_field('receiver_id')
+      .map { |id| NEAR::Account.new(id) }
+  end
+
+  ##
+  # Enumerates the transactions in this block.
+  #
+  # @yield [NEAR::Transaction]
+  # @yieldparam [NEAR::Transaction] transaction
+  # @yieldreturn [void]
+  # @return [Enumerator] if no block is given
+  def each_transaction(&block)
+    return enum_for(:each_transaction) unless block_given?
+    self.shards.each do |shard|
+      shard['chunk']['transactions'].each do |tx|
+        block.call(NEAR::Transaction.parse(tx))
+      end
+    end
   end
 
   ##
@@ -96,4 +136,19 @@ class NEAR::Block
   ##
   # @return [Hash]
   def to_h; @data; end
+
+  protected
+
+  ##
+  # @param [String] field
+  # @return [Array<String>]
+  def collect_transaction_field(field)
+    result = {}
+    self.shards.each do |shard|
+      shard['chunk']['transactions'].each do |tx|
+        result[tx['transaction']['receiver_id']] = true
+      end
+    end
+    result.keys
+  end
 end # NEAR::Block
