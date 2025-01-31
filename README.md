@@ -60,11 +60,40 @@ Thanks to the built-in [neardata.xyz] API client, it is trivial to
 track the current tip of the chain in a robust and efficient manner:
 
 ```ruby
-block_height = NEAR.testnet.fetch_latest.height
-(block_height..).each do |block_height|
-  block = NEAR.testnet.fetch(block_height)
-
+NEAR.testnet.fetch_blocks do |block|
   puts [block.height, block.hash].join("\t")
+end
+```
+
+### Tracking chain transactions
+
+```ruby
+NEAR.testnet.fetch_blocks do |block|
+  puts block.inspect
+
+  block.each_transaction do |transaction|
+    puts "\t" + transaction.inspect
+  end
+end
+```
+
+### Tracking chain actions
+
+```ruby
+NEAR.testnet.fetch_blocks do |block|
+  puts block.inspect
+
+  block.each_action do |action|
+    puts "\t" + action.inspect
+  end
+end
+```
+
+### Tracking contract interactions
+
+```ruby
+NEAR.testnet.fetch_blocks do |block|
+  # TODO
 end
 ```
 

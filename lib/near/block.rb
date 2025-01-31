@@ -106,11 +106,29 @@ class NEAR::Block
   # @yieldparam [NEAR::Transaction] transaction
   # @yieldreturn [void]
   # @return [Enumerator] if no block is given
-  def each_transaction(&block)
+  def each_transaction(&)
     return enum_for(:each_transaction) unless block_given?
     self.shards.each do |shard|
       shard['chunk']['transactions'].each do |tx|
-        block.call(NEAR::Transaction.parse(tx))
+        yield NEAR::Transaction.parse(tx)
+      end
+    end
+  end
+
+  ##
+  # Enumerates the actions in this block.
+  #
+  # @yield [NEAR::Action]
+  # @yieldparam [NEAR::Action] action
+  # @yieldreturn [void]
+  # @return [Enumerator] if no block is given
+  def each_action(&)
+    return enum_for(:each_action) unless block_given?
+    self.shards.each do |shard|
+      shard['chunk']['transactions'].each do |tx|
+        tx['transaction']['actions'].each do |action|
+          yield NEAR::Action.parse(action)
+        end
       end
     end
   end
@@ -136,6 +154,12 @@ class NEAR::Block
   ##
   # @return [Hash]
   def to_h; @data; end
+
+  ##
+  # @return [String]
+  def inspect
+    "#<#{self.class.name} height: #{@height}, hash: #{@hash.inspect}>"
+  end
 
   protected
 

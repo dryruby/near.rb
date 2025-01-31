@@ -92,10 +92,10 @@ class NEAR::Transaction
   # @yieldparam [NEAR::Action] action
   # @yieldreturn [void]
   # @return [Enumerator] if no block is given
-  def each_action(&block)
+  def each_action(&)
     return enum_for(:each_action) unless block_given?
     self.data['actions'].each do |action|
-      block.call(NEAR::Action.parse(action))
+      yield NEAR::Action.parse(action)
     end
   end
 
@@ -106,4 +106,10 @@ class NEAR::Transaction
   ##
   # @return [Hash]
   def to_h; @data; end
+
+  ##
+  # @return [String]
+  def inspect
+    "#<#{self.class.name} hash: #{@hash.inspect}, signer: #{self.signer}, receiver: #{self.receiver}, actions: #{self.actions.size}>"
+  end
 end # NEAR::Transaction

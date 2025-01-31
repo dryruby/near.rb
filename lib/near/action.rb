@@ -54,11 +54,22 @@ class NEAR::Action
   class Delegate < NEAR::Action; end
 
   ##
-  # @param [Hash, #to_h] data
+  # @param [String, Hash] data
   # @return [NEAR::Action]
   def self.parse(data)
-    data = data.to_h
     case
+      when data.is_a?(String) then case
+        when 'CreateAccount' then CreateAccount.new
+        when 'DeployContract' then DeployContract.new
+        when 'FunctionCall' then FunctionCall.new
+        when 'Transfer' then Transfer.new
+        when 'Stake' then Stake.new
+        when 'AddKey' then AddKey.new
+        when 'DeleteKey' then DeleteKey.new
+        when 'DeleteAccount' then DeleteAccount.new
+        when 'Delegate' then Delegate.new
+        else self.new
+      end
       when data['CreateAccount'] then CreateAccount.new(data['CreateAccount'])
       when data['DeployContract'] then DeployContract.new(data['DeployContract'])
       when data['FunctionCall'] then FunctionCall.new(data['FunctionCall'])
@@ -74,8 +85,15 @@ class NEAR::Action
 
   ##
   # @param [Hash, #to_h] data
-  def initialize(data)
+  def initialize(data = nil)
     @data = data.to_h if data
+  end
+
+  ##
+  # @return [Symbol]
+  attr_reader :type
+  def type
+    self.class.name.split('::').last.to_sym
   end
 
   ##
@@ -86,5 +104,13 @@ class NEAR::Action
 
   ##
   # @return [Hash]
-  def to_h; @data; end
+  def to_h; @data || {}; end
+
+  ##
+  # @return [String]
+  def inspect
+    data = self.to_h
+    data['args'] = '...' if data['args']
+    "#<#{self.class.name} #{data.to_json}>"
+  end
 end # NEAR::Block

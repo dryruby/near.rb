@@ -29,6 +29,26 @@ class NEAR::Network
   end
 
   ##
+  # Fetches a block range.
+  #
+  # The block data is fetched from the neardata.xyz API.
+  #
+  # @param [NEAR::Block, #to_i] from
+  # @param [NEAR::Block, #to_i] to
+  # @yield [NEAR::Block]
+  # @yieldparam [NEAR::Block] block
+  # @yieldreturn [void]
+  # @return [Enumerator]
+  def fetch_blocks(from: nil, to: nil, &)
+    return enum_for(:fetch_blocks) unless block_given?
+    from = self.fetch_latest.height unless from
+    from, to = from.to_i, to&.to_i
+    (from..to).each do |block_height|
+      yield self.fetch(block_height)
+    end
+  end
+
+  ##
   # Fetches the block at the given height.
   #
   # The block data is fetched from the neardata.xyz API.
