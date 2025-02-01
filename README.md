@@ -38,6 +38,23 @@ gem install near
 
 ## 👉 Examples
 
+- [Importing the library](#importing-the-library)
+- [Fetching block information](#fetching-block-information)
+- [Tracking block production](#tracking-block-production)
+- [Tracking chain transactions](#tracking-chain-transactions)
+- [Tracking chain actions](#tracking-chain-actions)
+- [Tracking contract interactions](#tracking-contract-interactions)
+- [Instantiating the CLI wrapper](#instantiating-the-cli-wrapper)
+- [Viewing account details](#viewing-account-details)
+- [Importing accounts](#importing-accounts)
+- [Creating accounts](#creating-accounts)
+- [Deleting accounts](#deleting-accounts)
+- [Managing access keys](#managing-access-keys)
+- [Managing tokens](#managing-tokens)
+- [Calling read-only contract methods](#calling-read-only-contract-methods)
+- [Calling mutative contract methods](#calling-mutative-contract-methods)
+- [Deploying a smart contract](#deploying-a-smart-contract)
+
 ### Importing the library
 
 ```ruby
