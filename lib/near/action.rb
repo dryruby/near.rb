@@ -1,6 +1,7 @@
 # This is free and unencumbered software released into the public domain.
 
 require 'base64'
+require 'json'
 
 ##
 # Represents a NEAR action.
@@ -21,6 +22,19 @@ class NEAR::Action
 
     ##
     # @return [String]
+    def json_args
+      @json_args ||= JSON.parse(self.args)
+    end
+
+    ##
+    # @param [Symbol, String, #to_s] key
+    # @return [Object]
+    def [](key)
+      self.json_args[key.to_s] rescue nil
+    end
+
+    ##
+    # @return [String]
     attr_reader :args
     def args
       @args ||= Base64.decode64(@data['args'])
@@ -37,11 +51,18 @@ class NEAR::Action
     # @return [NEAR::Balance]
     attr_reader :deposit
     def deposit
-      @deposit ||= NEAR::Balance.new(@data['deposit'])
+      @deposit ||= NEAR::Balance.parse(@data['deposit'])
     end
   end
 
-  class Transfer < NEAR::Action; end
+  class Transfer < NEAR::Action
+    ##
+    # @return [NEAR::Balance]
+    attr_reader :deposit
+    def deposit
+      @deposit ||= NEAR::Balance.parse(@data['deposit'])
+    end
+  end
 
   class Stake < NEAR::Action; end
 
@@ -105,6 +126,10 @@ class NEAR::Action
   ##
   # @return [Hash]
   def to_h; @data || {}; end
+
+  ##
+  # @return [Symbol]
+  def to_sym; self.type; end
 
   ##
   # @return [String]

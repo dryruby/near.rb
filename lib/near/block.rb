@@ -108,8 +108,9 @@ class NEAR::Block
   # @return [Enumerator] if no block is given
   def each_transaction(&)
     return enum_for(:each_transaction) unless block_given?
-    self.shards.each do |shard|
-      shard['chunk']['transactions'].each do |tx|
+    self.each_chunk do |chunk|
+      next if !chunk['transactions']
+      chunk['transactions'].each do |tx|
         yield NEAR::Transaction.parse(tx)
       end
     end
@@ -124,12 +125,52 @@ class NEAR::Block
   # @return [Enumerator] if no block is given
   def each_action(&)
     return enum_for(:each_action) unless block_given?
-    self.shards.each do |shard|
-      shard['chunk']['transactions'].each do |tx|
+    self.each_chunk do |chunk|
+      next if !chunk['transactions']
+      chunk['transactions'].each do |tx|
+        next if !tx['transaction']['actions']
         tx['transaction']['actions'].each do |action|
           yield NEAR::Action.parse(action)
         end
       end
+    end
+  end
+
+  ##
+  # @param [Symbol, #to_sym] type
+  # @param [String, Regexp] signer
+  # @param [String, Regexp] receiver
+  # @param [String, Regexp] method_name
+  # @yield [NEAR::Action]
+  # @yieldparam [NEAR::Action] action
+  # @yieldreturn [void]
+  # @return [Enumerator] if no block is given
+  def find_actions(type, signer: nil, receiver: nil, method_name: nil, &)
+    return enum_for(:each_action) unless block_given?
+    type = type.to_sym
+    self.each_transaction do |tx|
+      next if signer && !(signer === tx.signer_id)
+      next if receiver && !(receiver === tx.receiver_id)
+      tx.each_action do |action|
+        next unless type == action.type
+        next if method_name && !(method_name === action.method_name)
+        yield action, tx
+      end
+    end
+  end
+
+  ##
+  # Enumerates the chunks in this block.
+  #
+  # @yield [Hash]
+  # @yieldparam [Hash] chunk
+  # @yieldreturn [void]
+  # @return [Enumerator] if no block is given
+  def each_chunk(&)
+    return enum_for(:each_chunk) unless block_given?
+    self.shards.each do |shard|
+      chunk = shard['chunk']
+      yield chunk if chunk
     end
   end
 

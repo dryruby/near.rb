@@ -5,6 +5,10 @@ require 'bigdecimal'
 ##
 # Represents a NEAR balance.
 class NEAR::Balance
+  def self.parse(s)
+    self.new(s.to_f / 10**24)
+  end
+
   def self.from_near(s)
     self.new(s)
   end
@@ -32,7 +36,7 @@ class NEAR::Balance
   #
   # @return [String]
   def inspect
-    "Ⓝ#{@quantity.to_f}"
+    "Ⓝ #{@quantity.to_f}"
   end
 
   ##

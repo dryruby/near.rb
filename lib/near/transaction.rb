@@ -33,21 +33,39 @@ class NEAR::Transaction
   attr_reader :data
 
   ##
-  # The transaction signer.
+  # The transaction signer account.
   #
   # @return [NEAR::Account]
   attr_reader :signer
   def signer
-    @signer ||= NEAR::Account.new(self.data['signer_id'])
+    @signer ||= NEAR::Account.new(self.signer_id)
   end
 
   ##
-  # The transaction receiver.
+  # The transaction signer ID.
+  #
+  # @return [String]
+  attr_reader :signer_id
+  def signer_id
+    self.data['signer_id']
+  end
+
+  ##
+  # The transaction receiver account.
   #
   # @return [NEAR::Account]
   attr_reader :receiver
   def receiver
-    @receiver ||= NEAR::Account.new(self.data['receiver_id'])
+    @receiver ||= NEAR::Account.new(self.receiver_id)
+  end
+
+  ##
+  # The transaction receiver ID.
+  #
+  # @return [String]
+  attr_reader :receiver_id
+  def receiver_id
+    self.data['receiver_id']
   end
 
   ##
