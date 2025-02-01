@@ -119,19 +119,16 @@ class NEAR::Block
   ##
   # Enumerates the actions in this block.
   #
-  # @yield [NEAR::Action]
+  # @yield [NEAR::Action, NEAR::Transaction]
   # @yieldparam [NEAR::Action] action
+  # @yieldparam [NEAR::Transaction] transaction
   # @yieldreturn [void]
   # @return [Enumerator] if no block is given
   def each_action(&)
     return enum_for(:each_action) unless block_given?
-    self.each_chunk do |chunk|
-      next if !chunk['transactions']
-      chunk['transactions'].each do |tx|
-        next if !tx['transaction']['actions']
-        tx['transaction']['actions'].each do |action|
-          yield NEAR::Action.parse(action)
-        end
+    self.each_transaction do |tx|
+      tx.each_action do |action|
+        yield action, tx
       end
     end
   end
@@ -141,8 +138,9 @@ class NEAR::Block
   # @param [String, Regexp] signer
   # @param [String, Regexp] receiver
   # @param [String, Regexp] method_name
-  # @yield [NEAR::Action]
+  # @yield [NEAR::Action, NEAR::Transaction]
   # @yieldparam [NEAR::Action] action
+  # @yieldparam [NEAR::Transaction] transaction
   # @yieldreturn [void]
   # @return [Enumerator] if no block is given
   def find_actions(type, signer: nil, receiver: nil, method_name: nil, &)

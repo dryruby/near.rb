@@ -67,6 +67,8 @@ end
 
 ### Tracking chain transactions
 
+See [`examples/monitor_all_transactions.rb`](examples/monitor_all_transactions.rb).
+
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
   puts block.inspect
@@ -78,6 +80,8 @@ end
 ```
 
 ### Tracking chain actions
+
+See [`examples/monitor_all_actions.rb`](examples/monitor_all_actions.rb).
 
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
@@ -91,9 +95,15 @@ end
 
 ### Tracking contract interactions
 
+See [`examples/index_evm_transactions.rb`](examples/index_evm_transactions.rb).
+
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
-  # TODO
+  puts block.inspect
+
+  block.find_actions(:FunctionCall, receiver: 'aurora', method_name: /^submit/) do |action|
+    puts "\t" + action.inspect
+  end
 end
 ```
 
