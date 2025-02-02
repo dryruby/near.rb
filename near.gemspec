@@ -24,9 +24,13 @@ Gem::Specification.new do |gem|
   gem.executables        = %w()
 
   gem.required_ruby_version = '>= 3.0'
+  gem.add_runtime_dependency 'base64' # Ruby 3.4.0+
+  gem.add_runtime_dependency 'bigdecimal' # Ruby 3.4.0+
   gem.add_runtime_dependency 'faraday', '>= 2.12'
   gem.add_runtime_dependency 'faraday-follow_redirects', '>= 0.3'
   gem.add_runtime_dependency 'faraday-retry', '>= 2.0'
+  #gem.add_runtime_dependency 'json'
+  #gem.add_runtime_dependency 'open3'
   gem.add_development_dependency 'rspec', '~> 3.12'
   gem.add_development_dependency 'yard' , '~> 0.9'
 end
