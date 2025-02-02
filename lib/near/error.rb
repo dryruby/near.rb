@@ -10,5 +10,9 @@ class NEAR::Error < StandardError
     end
 
     attr_reader :block_height
-  end
+  end # NEAR::Error::InvalidBlock
+
+  class TemporaryProblem < NEAR::Error; end
+
+  class UnexpectedProblem < NEAR::Error; end
 end # NEAR::Error

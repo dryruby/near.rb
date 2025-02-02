@@ -89,7 +89,7 @@ class NEAR::Network
       case error.response[:body]['type']
         when "BLOCK_DOES_NOT_EXIST", "BLOCK_HEIGHT_TOO_LOW", "BLOCK_HEIGHT_TOO_HIGH"
           raise NEAR::Error::InvalidBlock, block_id
-        else raise error
+        else raise NEAR::Error::UnexpectedProblem
       end
     end
 
@@ -103,17 +103,32 @@ class NEAR::Network
   ##
   # @return [Object]
   def fetch_neardata_url(path)
-    self.http_client.get("#{neardata_url}#{path}").body
+    begin
+      retries ||= 0
+      self.http_client.get("#{neardata_url}#{path}").body
+    rescue Faraday::ConnectionFailed => error
+      # `Faraday::Retry` doesn't seem able to handle `ConnectionFailed`,
+      # so we'll handle it manually here. Note that in case of a DNS error,
+      # there's no point in retrying, so we'll wrap & re-raise the error.
+      case error.wrapped_exception
+        when Socket::ResolutionError then raise NEAR::Error::TemporaryProblem
+        else retry if (retries += 1) < 3
+      end
+      raise NEAR::Error::UnexpectedProblem
+    end
   end
 
   ##
   # @return [Faraday::Connection]
   def http_client
     Faraday.new do |faraday|
-      faraday.request :retry
       faraday.response :raise_error
       faraday.response :follow_redirects
       faraday.response :json
+      faraday.request :retry, {
+        max: 3,
+        exceptions: Faraday::Retry::Middleware::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed]
+      }.freeze
     end
   end
 end # NEAR::Testnet
