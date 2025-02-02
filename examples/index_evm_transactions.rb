@@ -10,6 +10,6 @@ NEAR.mainnet.fetch_blocks do |block|
     warn "\t" + transaction.inspect if ARGV.include?('-d')
     warn "\t\t" + submit.inspect if ARGV.include?('-d')
 
-    puts "Submitted an EVM transaction from '#{transaction.signer}' to '#{transaction.receiver}'"
+    puts "Indexed an EVM transaction of size #{submit.args.size} from #{transaction.signer} to #{transaction.receiver}"
   end
 end
