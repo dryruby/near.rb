@@ -6,12 +6,13 @@
 [![Documentation](https://img.shields.io/badge/rubydoc-latest-blue)](https://rubydoc.info/gems/near)
 
 **NEAR.rb** is a [Ruby] client library for the [NEAR Protocol].
-It provides a [neardata.xyz] API client as well as wraps the
-[NEAR command-line interface] (CLI) in a usable Ruby interface.
+It provides a [neardata.xyz] API client for block data as well as wraps the
+[NEAR Command-Line Interface] (CLI) in a high-productivity Ruby interface.
 
 ## ✨ Features
 
 - Fetches block data from the [neardata.xyz] API.
+- Supports parsing of block, chunk, transaction, and action data.
 - Wraps the complete CLI features in an idiomatic Ruby interface.
 - Provides comprehensive account management operations.
 - Supports token operations for NEAR and other assets.
