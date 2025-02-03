@@ -26,7 +26,7 @@ It provides a [neardata.xyz] API client for block data as well as wraps the
 
 ## 🛠️ Prerequisites
 
-- [NEAR CLI] 0.19+
+- [NEAR CLI] 0.18+
 - [Ruby] 3.0+
 
 ## ⬇️ Installation
@@ -85,8 +85,6 @@ end
 
 ### Tracking chain transactions
 
-See [`examples/monitor_all_transactions.rb`](examples/monitor_all_transactions.rb).
-
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
   puts block.inspect
@@ -97,9 +95,12 @@ NEAR.testnet.fetch_blocks do |block|
 end
 ```
 
-### Tracking chain actions
+For a more elaborated example, see
+[`examples/monitor_all_transactions.rb`](examples/monitor_all_transactions.rb):
 
-See [`examples/monitor_all_actions.rb`](examples/monitor_all_actions.rb).
+[![monitor_all_transactions.rb](examples/monitor_all_transactions.gif)](examples/monitor_all_transactions.gif)
+
+### Tracking chain actions
 
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
@@ -111,9 +112,12 @@ NEAR.testnet.fetch_blocks do |block|
 end
 ```
 
-### Tracking contract interactions
+For a more elaborated example, see
+[`examples/monitor_all_actions.rb`](examples/monitor_all_actions.rb):
 
-See [`examples/index_evm_transactions.rb`](examples/index_evm_transactions.rb).
+[![monitor_all_actions.rb](examples/monitor_all_actions.gif)](examples/monitor_all_actions.gif)
+
+### Tracking contract interactions
 
 ```ruby
 NEAR.testnet.fetch_blocks do |block|
@@ -124,6 +128,11 @@ NEAR.testnet.fetch_blocks do |block|
   end
 end
 ```
+
+For a more elaborated example, see
+[`examples/index_evm_transactions.rb`](examples/index_evm_transactions.rb):
+
+[![index_evm_transactions.rb](examples/index_evm_transactions.gif)](examples/index_evm_transactions.gif)
 
 ### Instantiating the CLI wrapper
 
