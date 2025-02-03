@@ -5,8 +5,18 @@
 #
 # @see https://nomicon.io/DataStructures/Account
 class NEAR::Account
+  ##
+  # @param [String, #to_s] id
+  # @return [NEAR::Account]
   def self.parse(id)
     self.new(id.to_s)
+  end
+
+  ##
+  # @return [NEAR::Account]
+  def self.temp
+    timestamp = (Time.now.to_f * 1_000).to_i
+    self.new("temp-#{timestamp}.testnet")
   end
 
   ##

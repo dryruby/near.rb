@@ -70,15 +70,20 @@ module NEAR::CLI::Account
   ##
   # Creates a new account sponsored by the faucet service.
   #
-  # @param [String] new_account_id
-  # @param [String] public_key
+  # @param [NEAR::Account, #to_s] new_account
+  # @param [String, nil] public_key
   # @return [String]
-  def create_account_with_faucet(new_account_id, public_key)
+  def create_account_with_faucet(new_account, public_key: nil)
     stdout, stderr = execute(
       'account',
       'create-account',
-      'sponsor-by-faucet-service', new_account_id,
-      'use-manually-provided-public-key', public_key,
+      'sponsor-by-faucet-service', new_account.to_s,
+      *case public_key
+        when nil then ['autogenerate-new-keypair', 'save-to-keychain']
+        when String then ['use-manually-provided-public-key', public_key]
+        when Array then public_key
+        else raise ArgumentError
+      end,
       'network-config', @network,
       'create'
     )
@@ -88,16 +93,22 @@ module NEAR::CLI::Account
   ##
   # Creates a new account funded by another account.
   #
-  # @param [NEAR::Account] new_account
-  # @param [NEAR::Account] signer Account that signs & funds the transaction
-  # @param [NEAR::Balance] deposit Amount of NEAR to attach
+  # @param [NEAR::Account, #to_s] new_account
+  # @param [NEAR::Account, #to_s] signer Account that signs & funds the transaction
+  # @param [String, nil] public_key
+  # @param [NEAR::Balance, #to_s] deposit Amount of NEAR to attach
   # @return [String]
-  def create_account_with_funding(new_account, signer:, deposit: nil)
+  def create_account_with_funding(new_account, signer:, public_key: nil, deposit: nil)
     stdout, stderr = execute(
       'account',
       'create-account',
       'fund-myself', new_account.to_s, (deposit ? deposit.to_s : '0') + ' NEAR',
-      'autogenerate-new-keypair', 'save-to-keychain',
+      *case public_key
+        when nil then ['autogenerate-new-keypair', 'save-to-keychain']
+        when String then ['use-manually-provided-public-key', public_key]
+        when Array then public_key
+        else raise ArgumentError
+      end,
       'sign-as', signer.to_s,
       'network-config', @network,
       'sign-with-keychain',

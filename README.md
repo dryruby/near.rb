@@ -187,7 +187,7 @@ result = testnet.import_account_with_private_key(
 # Create an account funded from a faucet (testnet only):
 result = testnet.create_account_with_faucet(
   'mynewaccount.testnet',
-  'ed25519:HVPgAsZkZ7cwLZDqK313XJsDyqAvgBxrATcD7VacA8KE'
+  public_key: 'ed25519:HVPgAsZkZ7cwLZDqK313XJsDyqAvgBxrATcD7VacA8KE'
 )
 
 # Create an account funded by another account:
@@ -207,8 +207,8 @@ result = testnet.create_implicit_account('/path/to/credentials/folder')
 ```ruby
 # Delete an existing account:
 result = testnet.delete_account(
-  'todelete.testnet',     # account to delete
-  'beneficiary.testnet'   # account receiving remaining balance
+  'my-obsolete-account.testnet',                # account to delete
+  beneficiary: 'v2.faucet.nonofficial.testnet'  # account receiving remaining balance
 )
 ```
 
