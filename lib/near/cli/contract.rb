@@ -36,7 +36,7 @@ module NEAR::CLI::Contract
   # @param [NEAR::Balance] deposit Amount of NEAR to attach
   # @param [NEAR::Gas, #to_s] gas Amount of gas to attach
   # @return [String] Transaction result
-  def call_function(contract, method_name, args = {}, signer:, deposit: nil, gas: '100.0 Tgas')
+  def call_function(contract, method_name, args = {}, signer: nil, deposit: nil, gas: '100.0 Tgas')
     args = case args
       when Hash, Array then ['json-args', args.to_json]
       when String then case
@@ -53,7 +53,7 @@ module NEAR::CLI::Contract
       *args,
       'prepaid-gas', gas.to_s,
       'attached-deposit', (deposit ? deposit.to_s : '0') + ' NEAR',
-      'sign-as', signer.to_s,
+      'sign-as', (signer || contract).to_s,
       'network-config', @network,
       'sign-with-keychain',
       'send'
@@ -65,34 +65,34 @@ module NEAR::CLI::Contract
   ##
   # Deploys a new contract.
   #
-  # @param [String] contract_id Account to deploy the contract to
+  # @param [NEAR::Account, #to_s] contract Account to deploy the contract to
   # @param [String] wasm_path Path to the .wasm file
-  # @param [String] signer_id Account that signs the transaction
   # @param [String, nil] init_method Method to call after deployment
   # @param [Hash] init_args Arguments for the init method
   # @param [String] init_deposit Deposit for the init method
   # @param [String] init_gas Gas for the init method
   # @return [String] Transaction result
-  def deploy_contract(contract_id, wasm_path, signer_id:, init_method: nil, init_args: {},
+  def deploy_contract(contract, wasm_path, init_method: nil, init_args: {},
                      init_deposit: '0 NEAR', init_gas: '30 TGas')
     args = [
       'contract',
       'deploy',
-      contract_id,
+      contract.to_s,
       'use-file', wasm_path
     ]
 
-    if init_method
-      args += [
+    args += if init_method
+      [
         'with-init-call', init_method,
         'json-args', init_args.to_json,
         'prepaid-gas', init_gas,
         'attached-deposit', init_deposit
       ]
+    else
+      ['without-init-call']
     end
 
     args += [
-      'sign-as', signer_id,
       'network-config', @network,
       'sign-with-keychain',
       'send'
