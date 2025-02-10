@@ -4,6 +4,12 @@
 # Represents a NEAR transaction.
 class NEAR::Transaction
   ##
+  # The maximum byte size of a NEAR transaction.
+  #
+  # @see https://github.com/near/nearcore/blob/3a584c2/core/parameters/res/runtime_configs/parameters.snap#L187
+  MAX_SIZE = 1_572_864
+
+  ##
   # @param [Hash] json
   # @return [NEAR::Transaction]
   def self.parse(json)
