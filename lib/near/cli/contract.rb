@@ -39,9 +39,9 @@ module NEAR::CLI::Contract
   def call_function(contract, method_name, args = {}, signer: nil, deposit: nil, gas: '100.0 Tgas')
     args = case args
       when Hash, Array then ['json-args', args.to_json]
-      when String then case
-        when args.ascii_only? then ['text-args', args]
-        else ['base64-args', Base64.strict_encode64(args)]
+      when String then case args
+        when /[^[:print:]]/ then ['base64-args', Base64.strict_encode64(args)]
+        else ['text-args', args]
       end
       when Pathname then ['file-args', args.to_s]
       else raise ArgumentError, "Invalid argument type: #{args.inspect}"
