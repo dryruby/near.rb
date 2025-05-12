@@ -31,6 +31,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'faraday-retry', '>= 2.0'
   #gem.add_runtime_dependency 'json'
   #gem.add_runtime_dependency 'open3'
-  gem.add_development_dependency 'rspec', '~> 3.12'
+  gem.add_development_dependency 'rspec', '~> 3.13'
   gem.add_development_dependency 'yard' , '~> 0.9'
 end
